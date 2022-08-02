@@ -20,32 +20,38 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name'] + ' - ' + temp['external_references'][0]['external_id']
-            value['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
-            value['meta'] = {}
-            value['meta']['external_id'] = temp['external_references'][0]['external_id']                
+            value = {
+                'description': temp['description'],
+                'value': temp['name']
+                + ' - '
+                + temp['external_references'][0]['external_id'],
+                'uuid': re.search('--(.*)$', temp['id'])[0][2:],
+                'meta': {},
+            }
+
+            value['meta']['external_id'] = temp['external_references'][0]['external_id']
             values.append(value)
 
-galaxy = {}
-galaxy['name'] = "Mobile Attack - Course of Action"
-galaxy['type'] = "mitre-mobile-attack-course-of-action"
-galaxy['description'] = "ATT&CK Mitigation"
-galaxy['uuid' ] = "0282356a-1708-11e8-8f53-975633d5c03c"
-galaxy['version'] = args.version
-galaxy['icon'] = "chain"
-galaxy['namespace'] = "mitre-attack"
+galaxy = {
+    'name': "Mobile Attack - Course of Action",
+    'type': "mitre-mobile-attack-course-of-action",
+    'description': "ATT&CK Mitigation",
+    'uuid': "0282356a-1708-11e8-8f53-975633d5c03c",
+    'version': args.version,
+    'icon': "chain",
+    'namespace': "mitre-attack",
+}
 
-cluster = {}
-cluster['name'] = "Mobile Attack - Course of Action"
-cluster['type'] = "mitre-mobile-attack-course-of-action"
-cluster['description'] = "ATT&CK Mitigation"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "03956f9e-1708-11e8-8395-976b24233e15"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Mobile Attack - Course of Action",
+    'type': "mitre-mobile-attack-course-of-action",
+    'description': "ATT&CK Mitigation",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "03956f9e-1708-11e8-8395-976b24233e15",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre-mobile-attack-course-of-action.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

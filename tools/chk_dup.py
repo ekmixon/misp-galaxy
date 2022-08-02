@@ -22,11 +22,13 @@ def loadjsons(path, return_paths=False):
         If return_paths is True, then every list item is a tuple of the
         file name and the file content
     """
-    files = []
     data = []
-    for name in os.listdir(path):
-        if os.path.isfile(os.path.join(path, name)) and name.endswith('.json'):
-            files.append(name)
+    files = [
+        name
+        for name in os.listdir(path)
+        if os.path.isfile(os.path.join(path, name)) and name.endswith('.json')
+    ]
+
     for jfile in files:
         filepath = os.path.join(path, jfile)
         if return_paths:
@@ -60,7 +62,7 @@ if __name__ == '__main__':
     counter = dict(counter)
     for key, val in counter.items():
         if val > 1:
-            print("Warning duplicate %s" % key)
+            print(f"Warning duplicate {key}")
             for item in namespace:
                 if item[0] == key:
                     print(item)

@@ -20,35 +20,36 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name']
-            value['meta'] = {}
+            value = {'description': temp['description'], 'value': temp['name'], 'meta': {}}
             value['meta']['synonyms'] = temp['aliases']
-            value['meta']['refs']= []
-            for reference in temp['external_references']:
-                if 'url' in reference:                    
-                    value['meta']['refs'].append(reference['url'])
-            value['meta']['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value['meta']['refs'] = [
+                reference['url']
+                for reference in temp['external_references']
+                if 'url' in reference
+            ]
+
+            value['meta']['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
             values.append(value)
 
-galaxy = {}
-galaxy['name'] = "Intrusion Set"
-galaxy['type'] = "mitre-intrusion-set"
-galaxy['description'] = "Name of ATT&CK Group"
-galaxy['uuid' ] = "1023f364-7831-11e7-8318-43b5531983ab"
-galaxy['version'] = args.version
-galaxy['icon'] = "user-secret"
+galaxy = {
+    'name': "Intrusion Set",
+    'type': "mitre-intrusion-set",
+    'description': "Name of ATT&CK Group",
+    'uuid': "1023f364-7831-11e7-8318-43b5531983ab",
+    'version': args.version,
+    'icon': "user-secret",
+}
 
-cluster = {} 
-cluster['name'] = "intrusion Set"
-cluster['type'] = "mitre-intrusion-set"
-cluster['description'] = "Name of ATT&CK Group"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "10df003c-7831-11e7-bdb9-971cdd1218df"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "intrusion Set",
+    'type': "mitre-intrusion-set",
+    'description': "Name of ATT&CK Group",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "10df003c-7831-11e7-bdb9-971cdd1218df",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre_intrusion-set.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

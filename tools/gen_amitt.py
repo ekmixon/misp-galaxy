@@ -17,11 +17,8 @@ class Amitt:
     """
 
     def __init__(self, infile='amitt_metadata_v3.xlsx'):
-        metadata = {}
         xlsx = pd.ExcelFile(infile)
-        for sheetname in xlsx.sheet_names:
-            metadata[sheetname] = xlsx.parse(sheetname)
-
+        metadata = {sheetname: xlsx.parse(sheetname) for sheetname in xlsx.sheet_names}
         # Create individual tables and dictionaries
         self.phases = metadata['phases']
         self.techniques = metadata['techniques']
@@ -39,17 +36,15 @@ class Amitt:
         return pd.Series(df.name.values, index=df.id).to_dict()
 
     def make_amitt_galaxy(self):
-        galaxy = {}
-        galaxy['name'] = 'Misinformation Pattern'
-        galaxy['type'] = 'amitt-misinformation-pattern'
-        galaxy['description'] = 'AM!TT Tactic'
-        galaxy['uuid'] = str(uuid.uuid4())
-        galaxy['version'] = 3
-        galaxy['icon'] = 'map'
-        galaxy['namespace'] = 'misinfosec'
-
-        galaxy['kill_chain_order'] = {
-            'misinformation-tactics': []
+        galaxy = {
+            'name': 'Misinformation Pattern',
+            'type': 'amitt-misinformation-pattern',
+            'description': 'AM!TT Tactic',
+            'uuid': str(uuid.uuid4()),
+            'version': 3,
+            'icon': 'map',
+            'namespace': 'misinfosec',
+            'kill_chain_order': {'misinformation-tactics': []},
         }
 
         for k, v in self.tacdict.items():
@@ -63,22 +58,21 @@ class Amitt:
             f.write('\n')
 
     def make_amitt_cluster(self):
-        cluster = {}
-        cluster['authors'] = ['misinfosecproject']
-        cluster['category'] = 'misinformation-pattern'
-        cluster['description'] = 'AM!TT Technique'
-        cluster['name'] = 'Misinformation Pattern'
-        cluster['source'] = 'https://github.com/misinfosecproject/amitt_framework'
-        cluster['type'] = 'amitt-misinformation-pattern'
-        cluster['uuid'] = str(uuid.uuid4())
-        cluster['values'] = []
-        cluster['version'] = 3
+        cluster = {
+            'authors': ['misinfosecproject'],
+            'category': 'misinformation-pattern',
+            'description': 'AM!TT Technique',
+            'name': 'Misinformation Pattern',
+            'source': 'https://github.com/misinfosecproject/amitt_framework',
+            'type': 'amitt-misinformation-pattern',
+            'uuid': str(uuid.uuid4()),
+            'values': [],
+            'version': 3,
+        }
 
         techniques = self.techniques.values.tolist()
 
         for technique in techniques:
-            t = {}
-
             if technique[1] != technique[1]:
                 technique[1] = ''
 
@@ -91,7 +85,7 @@ class Amitt:
             if technique[1] == technique[2] == technique[3] == '':
                 continue
 
-            t['uuid'] = str(uuid.uuid4())
+            t = {'uuid': str(uuid.uuid4())}
             t['value'] = technique[1]
             t['description'] = technique[3]
             t['meta'] = {
@@ -110,22 +104,21 @@ class Amitt:
         return cluster
 
     def make_amitt_task_cluster(self):
-        cluster = {}
-        cluster['authors'] = ['misinfosecproject']
-        cluster['category'] = 'misinformation-pattern'
-        cluster['description'] = 'AM!TT Task'
-        cluster['name'] = 'Misinformation Task'
-        cluster['source'] = 'https://github.com/misinfosecproject/amitt_framework'
-        cluster['type'] = 'amitt-misinformation-pattern'
-        cluster['uuid'] = str(uuid.uuid4())
-        cluster['values'] = []
-        cluster['version'] = '3'
+        cluster = {
+            'authors': ['misinfosecproject'],
+            'category': 'misinformation-pattern',
+            'description': 'AM!TT Task',
+            'name': 'Misinformation Task',
+            'source': 'https://github.com/misinfosecproject/amitt_framework',
+            'type': 'amitt-misinformation-pattern',
+            'uuid': str(uuid.uuid4()),
+            'values': [],
+            'version': '3',
+        }
 
         techniques = self.techniques.values.tolist()
 
         for technique in techniques:
-            t = {}
-
             if technique[1] != technique[1]:
                 technique[1] = ''
 
@@ -138,7 +131,7 @@ class Amitt:
             if technique[1] == technique[2] == technique[3] == '':
                 continue
 
-            t['uuid'] = str(uuid.uuid4())
+            t = {'uuid': str(uuid.uuid4())}
             t['value'] = technique[1]
             t['description'] = technique[3]
             t['meta'] = {

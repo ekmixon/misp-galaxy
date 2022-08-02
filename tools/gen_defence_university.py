@@ -54,44 +54,31 @@ def _buildArticleSection(nxtSibling):
                 if (len(_anchors) != 0):
                     _anch = _anchors[0]
 
-                if (_anch is not None):
-                    _curRef = _anch['href']
-                else:
-                    _curRef = None
-            elif ((token.name != 'em') or (not ("Last updated" in token.text))):  # ignore the "last updated footer
+                _curRef = _anch['href'] if (_anch is not None) else None
+            elif token.name != 'em' or "Last updated" not in token.text:  # ignore the "last updated footer
                 if (_curClause is not None):
-                    if (isinstance(token, bs4.element.NavigableString)):
-                        _curClause = _curClause + token
-                    else:
-                        _curClause = _curClause + token.text
-                else:
-                    # anomalous html handling
-                    #  - <strong> and
-                    #  - (useless) <a> tags
-                    # appear in a few places
-                    if ((token.name != 'strong') and
-                            (token.name != 'em') and
-                            (token.name != 'br') and
-                            (token.name != 'sup') and
-                            (token.name != 'a')):
-                        _curClause = token  # this quashes them
+                    _curClause = (
+                        _curClause + token
+                        if (isinstance(token, bs4.element.NavigableString))
+                        else _curClause + token.text
+                    )
+
+                elif token.name not in ['strong', 'em', 'br', 'sup', 'a']:
+                    _curClause = token  # this quashes them
 
             # Once a 'clause' AND a 'statement' are accumulated, an encapsulating
             # 'statement' is appended to the section's list of paragraphs and
             # are reset.
             if ((_curRef is not None) and (_curClause is not None)):
-                statement = {}
-                statement["clause"] = _curClause
-                statement["ref"] = _curRef
+                statement = {"clause": _curClause, "ref": _curRef}
                 _sectionParagraphs.append(statement)
                 _curClause = None
                 _curRef = None
 
         # If a sequence of 'clauses' have been accumulated without finding a reference
         # create a reference-LESS statement.
-        if ((_curClause is not None) and (not "Last updated" in _curClause)):
-            statement = {}
-            statement["clause"] = _curClause
+        if _curClause is not None and "Last updated" not in _curClause:
+            statement = {"clause": _curClause}
             _sectionParagraphs.append(statement)
 
         _nxtsib = _nxtsib.find_next_sibling()
@@ -102,15 +89,9 @@ def _buildArticleSection(nxtSibling):
 def _buildListSection(listContent):
     laboratories = []
     for lab in listContent.find_all('li', recursive="False"):
-        _lab = {}
-        _lab['name'] = lab.contents[0].replace(u'\xa0', '')
-
+        _lab = {'name': lab.contents[0].replace(u'\xa0', '')}
         ref = lab.find('a')
-        if (ref is not None):
-            _lab['ref'] = ref['href']
-        else:
-            _lab['ref'] = None
-
+        _lab['ref'] = ref['href'] if (ref is not None) else None
         laboratories.append(_lab)
 
     return laboratories
@@ -121,9 +102,7 @@ def _fetchArticle(url):
     soup = BeautifulSoup(response.content, 'html5lib')
     _article = soup.body.find_all('article')[0]
 
-    article = {}
-    article['url'] = url
-    article['name'] = _article.h1.text.replace('\n', '').strip()
+    article = {'url': url, 'name': _article.h1.text.replace('\n', '').strip()}
     article['_name'] = _article.h2.contents[0]
 
     _artbody = _article.find('div', {"class": "article__copy"})
@@ -139,12 +118,13 @@ def _fetchArticle(url):
     for _heading in _artbody.findChildren('h2'):
         _nxtSibling = _heading.find_next_sibling()
 
-        section = {}
-        section['title'] = _heading.text
-        if (_nxtSibling.name == 'ul'):
-            section['body'] = _buildListSection(_nxtSibling)
-        else:
-            section['body'] = _buildArticleSection(_nxtSibling)
+        section = {
+            'title': _heading.text,
+            'body': _buildListSection(_nxtSibling)
+            if (_nxtSibling.name == 'ul')
+            else _buildArticleSection(_nxtSibling),
+        }
+
         sections.append(section)
 
     article['sections'] = sections
@@ -160,19 +140,17 @@ def _fetchArticle(url):
         _items = []
         for _item in _paneldiv.find_all('li'):
             _anch = _item.find('a')
-            if (_anch is not None):
-                if ("Location" in _title):  # locations
-                    _loc = {}
-                    _loc['name'] = _anch.contents[0].replace('\n', '').strip()
-                    _loc['ref'] = _anch['href']
-                    _latlong = _anch['href'].split("=")[1]
-                    _loc['lat'] = _latlong.split(",")[0]
-                    _loc['long'] = _latlong.split(",")[1]
-                    _items.append(_loc)
-                else:
-                    _items.append(_anch.text)
-            else:
+            if _anch is None:
                 _items.append(_item.text.replace('\n', '').strip())
+            elif ("Location" in _title):  # locations
+                _loc = {'name': _anch.contents[0].replace('\n', '').strip()}
+                _loc['ref'] = _anch['href']
+                _latlong = _anch['href'].split("=")[1]
+                _loc['lat'] = _latlong.split(",")[0]
+                _loc['long'] = _latlong.split(",")[1]
+                _items.append(_loc)
+            else:
+                _items.append(_anch.text)
         article[_title.lower()] = _items
 
     return article
@@ -227,9 +205,8 @@ def _gen_galaxy(scrape):
         else:
             new_template["description"] += uni["name"] + f" ({uni['_name']})"
 
-        if uni.get("risk"):
-            if uni.get("risk") != "":
-                new_template["meta"]["risk"] = uni["risk statement"]
+        if uni.get("risk") and uni.get("risk") != "":
+            new_template["meta"]["risk"] = uni["risk statement"]
 
         _append_meta("aliases", "aliases")
 
@@ -246,9 +223,8 @@ def _gen_galaxy(scrape):
             for section in uni["sections"]:
                 if section["title"] == "Major defence laboratories":
                     for lab in section["body"]:
-                        if lab.get("name"):
-                            if lab["name"] != "":
-                                labs.append(lab["name"])
+                        if lab.get("name") and lab["name"] != "":
+                            labs.append(lab["name"])
             if labs:
                 new_template["meta"]["major defence laboratories"] = labs
 
@@ -278,7 +254,7 @@ def main():
         if head is not None:
             colOne = row.find_all('td')[0].find_all('a')[0]['href']
             article = _fetchArticle(url + colOne)
-            print("Processing: {}".format(url + colOne))
+            print(f"Processing: {url + colOne}")
             articles.append(article)
         else:
             head = "bloop"

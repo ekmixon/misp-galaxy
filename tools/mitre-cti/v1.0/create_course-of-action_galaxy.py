@@ -20,30 +20,29 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name']
-            value['meta'] = {}
-            value['meta']['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value = {'description': temp['description'], 'value': temp['name'], 'meta': {}}
+            value['meta']['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
             values.append(value)
 
-galaxy = {}
-galaxy['name'] = "Course of Action"
-galaxy['type'] = "mitre-course-of-action"
-galaxy['description'] = "ATT&CK Mitigation"
-galaxy['uuid' ] = "6fcb4472-6de4-11e7-b5f7-37771619e14e"
-galaxy['version'] = args.version
-galaxy['icon'] = "chain"
+galaxy = {
+    'name': "Course of Action",
+    'type': "mitre-course-of-action",
+    'description': "ATT&CK Mitigation",
+    'uuid': "6fcb4472-6de4-11e7-b5f7-37771619e14e",
+    'version': args.version,
+    'icon': "chain",
+}
 
-cluster = {} 
-cluster['name'] = "Course of Action"
-cluster['type'] = "mitre-course-of-action"
-cluster['description'] = "ATT&CK Mitigation"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "a8825ae8-6dea-11e7-8d57-7728f3cfe086"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Course of Action",
+    'type': "mitre-course-of-action",
+    'description': "ATT&CK Mitigation",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "a8825ae8-6dea-11e7-8d57-7728f3cfe086",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre_course-of-action.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

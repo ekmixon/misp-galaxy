@@ -11,8 +11,8 @@ class ObjectEncoder(json.JSONEncoder):
         if hasattr(obj, "to_json"):
             return self.default(obj.to_json())
         elif hasattr(obj, "__dict__"):
-            d = dict(
-                (key, value)
+            d = {
+                key: value
                 for key, value in inspect.getmembers(obj)
                 if not key.startswith("__")
                 and not inspect.isabstract(value)
@@ -23,7 +23,8 @@ class ObjectEncoder(json.JSONEncoder):
                 and not inspect.ismethod(value)
                 and not inspect.ismethoddescriptor(value)
                 and not inspect.isroutine(value)
-            )
+            }
+
             return self.default(d)
         return obj
 

@@ -20,39 +20,45 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name'] + ' - ' + temp['external_references'][0]['external_id']
-            value['meta'] = {}
+            value = {
+                'description': temp['description'],
+                'value': temp['name']
+                + ' - '
+                + temp['external_references'][0]['external_id'],
+                'meta': {},
+            }
+
             value['meta']['refs'] = []
             for reference in temp['external_references']:
                 if 'url' in reference and reference['url'] not in value['meta']['refs']:
                     value['meta']['refs'].append(reference['url'])
                 if 'external_id' in reference:
-                    value['meta']['external_id'] = reference['external_id']                      
+                    value['meta']['external_id'] = reference['external_id']
             if'x_mitre_aliases' in temp:
                 value['meta']['synonyms'] = temp['x_mitre_aliases']
-            value['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
             values.append(value)
 
-galaxy = {}
-galaxy['name'] = "Mobile Attack - Tool"
-galaxy['type'] = "mitre-mobile-attack-tool"
-galaxy['description'] = "Name of ATT&CK software"
-galaxy['uuid' ] = "1d0b4bce-1708-11e8-9e6e-1b130c9b0a91"
-galaxy['version'] = args.version
-galaxy['icon'] = "gavel"
-galaxy['namespace'] = "mitre-attack"
+galaxy = {
+    'name': "Mobile Attack - Tool",
+    'type': "mitre-mobile-attack-tool",
+    'description': "Name of ATT&CK software",
+    'uuid': "1d0b4bce-1708-11e8-9e6e-1b130c9b0a91",
+    'version': args.version,
+    'icon': "gavel",
+    'namespace': "mitre-attack",
+}
 
-cluster = {}
-cluster['name'] = "Mobile Attack - Tool"
-cluster['type'] = "mitre-mobile-attack-tool"
-cluster['description'] = "Name of ATT&CK software"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "02cee87e-1708-11e8-8f15-8b33e4d6194b"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Mobile Attack - Tool",
+    'type': "mitre-mobile-attack-tool",
+    'description': "Name of ATT&CK software",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "02cee87e-1708-11e8-8f15-8b33e4d6194b",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre-mobile-attack-tool.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

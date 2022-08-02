@@ -20,38 +20,39 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name']
-            value['meta'] = {}
-            value['meta']['refs'] = []
-            for reference in temp['external_references']:
-                if 'url' in reference:                    
-                    value['meta']['refs'].append(reference['url'])
+            value = {'description': temp['description'], 'value': temp['name'], 'meta': {}}
+            value['meta']['refs'] = [
+                reference['url']
+                for reference in temp['external_references']
+                if 'url' in reference
+            ]
+
             if 'x_mitre_data_sources' in temp:
                 value['meta']['mitre_data_sources'] = temp['x_mitre_data_sources']
             if 'x_mitre_platforms' in temp:
                 value['meta']['mitre_platforms'] = temp['x_mitre_platforms']
             values.append(value)
-            value['meta']['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value['meta']['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
 
-galaxy = {}
-galaxy['name'] = "Attack Pattern"
-galaxy['type'] = "mitre-attack-pattern"
-galaxy['description'] = "ATT&CK Tactic"
-galaxy['uuid' ] = "c4e851fa-775f-11e7-8163-b774922098cd"
-galaxy['version'] = args.version
-galaxy['icon'] = "map"
+galaxy = {
+    'name': "Attack Pattern",
+    'type': "mitre-attack-pattern",
+    'description': "ATT&CK Tactic",
+    'uuid': "c4e851fa-775f-11e7-8163-b774922098cd",
+    'version': args.version,
+    'icon': "map",
+}
 
-cluster = {} 
-cluster['name'] = "Attack Pattern"
-cluster['type'] = "mitre-attack-pattern"
-cluster['description'] = "ATT&CK tactic"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "dcb864dc-775f-11e7-9fbb-1f41b4996683"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Attack Pattern",
+    'type': "mitre-attack-pattern",
+    'description': "ATT&CK tactic",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "dcb864dc-775f-11e7-9fbb-1f41b4996683",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre_attack-pattern.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

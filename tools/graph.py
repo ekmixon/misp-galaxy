@@ -17,16 +17,18 @@ args = parser.parse_args()
 
 def gen_galaxy_tag(galaxy_name, cluster_name):
     # return 'misp-galaxy:{}="{}"'.format(galaxy_name, cluster_name)
-    return '{}={}'.format(galaxy_name, cluster_name)
+    return f'{galaxy_name}={cluster_name}'
 
 files_to_ignore = ['mitre-attack-pattern.json', 'mitre-course-of-action.json', 'mitre-intrusion-set.json',
                    'mitre-malware.json', 'mitre-tool.json']
 
-galaxies_fnames = []
 pathClusters = '../clusters'
-for f in os.listdir(pathClusters):
-    if '.json' in f and f not in files_to_ignore:
-        galaxies_fnames.append(f)
+galaxies_fnames = [
+    f
+    for f in os.listdir(pathClusters)
+    if '.json' in f and f not in files_to_ignore
+]
+
 galaxies_fnames.sort()
 
 cluster_uuids = {}
@@ -156,40 +158,34 @@ def gen_dot(uuid):
 
 if args.uuid:
     uuid = args.uuid
-    dot = []
-    # dot.append('digraph G {')
-    dot.append('concentrate=true;')
-    dot.append('overlap=scale;')
+    dot = ['concentrate=true;', 'overlap=scale;']
     generated_dot = gen_dot(uuid)
     if len(generated_dot) == 0:
-        print("Empty graph for uuid: {}".format(uuid))
+        print(f"Empty graph for uuid: {uuid}")
         exit()
-    print("Generating graph for uuid: {}".format(uuid))
+    print(f"Generating graph for uuid: {uuid}")
     dot += generated_dot
     # dot.append('}')
     # dg.source = '\n'.join(dot)
     dg = Digraph(engine='neato', format='png', body=dot)
     # print(dg.source)
-    dg.render(filename='graphs/{}'.format(uuid), cleanup=False)
+    dg.render(filename=f'graphs/{uuid}', cleanup=False)
 
 elif args.all:
     for uuid in cluster_uuids.keys():
-        dot = []
-        # dot.append('digraph G {')
-        dot.append('concentrate=true;')
-        dot.append('overlap=scale;')
+        dot = ['concentrate=true;', 'overlap=scale;']
         generated_dot = gen_dot(uuid)
         if len(generated_dot) == 0:
-            print("Empty      graph for uuid: {}".format(uuid))
+            print(f"Empty      graph for uuid: {uuid}")
             continue
 
-        print("Generating graph for uuid: {}".format(uuid))
+        print(f"Generating graph for uuid: {uuid}")
         dot += generated_dot
         # dot.append('}')
         # dg.source = '\n'.join(dot)
 
         dg = Digraph(format='png', body=dot)
         #print(dg.source)
-        dg.render(filename='graphs/{}'.format(uuid))
+        dg.render(filename=f'graphs/{uuid}')
 else:
     exit("No parameters given, use --help for more info.")

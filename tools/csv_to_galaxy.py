@@ -31,9 +31,7 @@ if __name__ == '__main__':
             if args.title:
                 args.title = False
                 continue
-            temp = {}
-            temp["value"] = data[args.value]
-            temp["description"] = ""
+            temp = {"value": data[args.value], "description": ""}
             if args.value_description is not None:
                 for i in args.value_description:
                     if data[i] != "":
@@ -44,15 +42,11 @@ if __name__ == '__main__':
                         temp["description"] = temp["description"] + data[i] + "; "
             values.append(temp)
 
-    galaxy = {}
-    galaxy["values"] = values
-
-    if args.version is not None:
-        galaxy["version"] = args.version
-    else:
-        galaxy["version"] = 1
-
-    galaxy["uuid"] = str(uuid.uuid4())
+    galaxy = {
+        "values": values,
+        "version": args.version if args.version is not None else 1,
+        "uuid": str(uuid.uuid4()),
+    }
 
     if args.description is not None:
         galaxy["description"] = args.description
@@ -66,22 +60,10 @@ if __name__ == '__main__':
     else:
         galaxy["authors"] = ["Various"]
 
-    if args.source is not None:
-        galaxy["source"] = args.source
-    else:
-        galaxy["source"] = "source"
-
-    if args.type is not None:
-        galaxy["type"] = args.type
-    else:
-        galaxy["type"] = "type"
-
-    if args.name is not None:
-        galaxy["name"] = args.name
-    else:
-        galaxy["name"] = "name"
-
+    galaxy["source"] = args.source if args.source is not None else "source"
+    galaxy["type"] = args.type if args.type is not None else "type"
+    galaxy["name"] = args.name if args.name is not None else "name"
     print (galaxy)
 
-    with open(args.type+'.json', 'w') as outfile:
-            json.dump(galaxy, outfile)
+    with open(f'{args.type}.json', 'w') as outfile:
+        json.dump(galaxy, outfile)

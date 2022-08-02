@@ -20,44 +20,54 @@ for element in os.listdir('.'):
 
             temp = d['objects'][0]
 
-            value = {}
-            value['description'] = temp['description']
-            value['value'] = temp['name'] + ' - ' + temp['external_references'][0]['external_id']
-            value['meta'] = {}
+            value = {
+                'description': temp['description'],
+                'value': temp['name']
+                + ' - '
+                + temp['external_references'][0]['external_id'],
+                'meta': {},
+            }
+
             value['meta']['refs'] = []
             for reference in temp['external_references']:
                 if 'url' in reference and reference['url'] not in value['meta']['refs']:
                     value['meta']['refs'].append(reference['url'])
                 if 'external_id' in reference:
                     value['meta']['external_id'] = reference['external_id']
-            value['meta']['kill_chain'] = []
-            for killchain in temp['kill_chain_phases']:
-                value['meta']['kill_chain'].append(killchain['kill_chain_name'] + ':pre-attack:' + killchain['phase_name'])
+            value['meta']['kill_chain'] = [
+                killchain['kill_chain_name']
+                + ':pre-attack:'
+                + killchain['phase_name']
+                for killchain in temp['kill_chain_phases']
+            ]
+
             if 'x_mitre_data_sources' in temp:
                 value['meta']['mitre_data_sources'] = temp['x_mitre_data_sources']
             if 'x_mitre_platforms' in temp:
                 value['meta']['mitre_platforms'] = temp['x_mitre_platforms']
             values.append(value)
-            value['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
 
-galaxy = {}
-galaxy['name'] = "Pre Attack - Attack Pattern"
-galaxy['type'] = "mitre-pre-attack-attack-pattern"
-galaxy['description'] = "ATT&CK Tactic"
-galaxy['uuid' ] = "1f665850-1708-11e8-9cfe-4792b2a91402"
-galaxy['version'] = args.version
-galaxy['icon'] = "map"
-galaxy['namespace'] = "mitre-attack"
+galaxy = {
+    'name': "Pre Attack - Attack Pattern",
+    'type': "mitre-pre-attack-attack-pattern",
+    'description': "ATT&CK Tactic",
+    'uuid': "1f665850-1708-11e8-9cfe-4792b2a91402",
+    'version': args.version,
+    'icon': "map",
+    'namespace': "mitre-attack",
+}
 
-cluster = {}
-cluster['name'] = "Pre Attack - Attack Pattern"
-cluster['type'] = "mitre-pre-attack-attack-pattern"
-cluster['description'] = "ATT&CK tactic"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "03c13bec-1708-11e8-92a0-a747c0787089"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Pre Attack - Attack Pattern",
+    'type': "mitre-pre-attack-attack-pattern",
+    'description': "ATT&CK tactic",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "03c13bec-1708-11e8-92a0-a747c0787089",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre-pre-attack-attack-pattern.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

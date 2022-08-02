@@ -33,27 +33,29 @@ for element in os.listdir('.'):
                     value['meta']['refs'].append(reference['url'])
                 if 'external_id' in reference:
                     value['meta']['external_id'] = reference['external_id']
-            value['uuid'] = re.search('--(.*)$', temp['id']).group(0)[2:]
+            value['uuid'] = re.search('--(.*)$', temp['id'])[0][2:]
             values.append(value)
 
-galaxy = {}
-galaxy['name'] = "Enterprise Attack -Intrusion Set"
-galaxy['type'] = "mitre-enterprise-attack-intrusion-set"
-galaxy['description'] = "Name of ATT&CK Group"
-galaxy['uuid' ] = "1f3b8c56-1708-11e8-b211-17a60c0f73ee"
-galaxy['version'] = args.version
-galaxy['icon'] = "user-secret"
-galaxy['namespace'] = "mitre-attack"
+galaxy = {
+    'name': "Enterprise Attack -Intrusion Set",
+    'type': "mitre-enterprise-attack-intrusion-set",
+    'description': "Name of ATT&CK Group",
+    'uuid': "1f3b8c56-1708-11e8-b211-17a60c0f73ee",
+    'version': args.version,
+    'icon': "user-secret",
+    'namespace': "mitre-attack",
+}
 
-cluster = {}
-cluster['name'] = "Enterprise Attack -intrusion Set"
-cluster['type'] = "mitre-enterprise-attack-intrusion-set"
-cluster['description'] = "Name of ATT&CK Group"
-cluster['version'] = args.version
-cluster['source'] = "https://github.com/mitre/cti"
-cluster['uuid' ] = "01f18402-1708-11e8-ac1c-1ffb3c4a7775"
-cluster['authors'] = ["MITRE"]
-cluster['values'] = values
+cluster = {
+    'name': "Enterprise Attack -intrusion Set",
+    'type': "mitre-enterprise-attack-intrusion-set",
+    'description': "Name of ATT&CK Group",
+    'version': args.version,
+    'source': "https://github.com/mitre/cti",
+    'uuid': "01f18402-1708-11e8-ac1c-1ffb3c4a7775",
+    'authors': ["MITRE"],
+    'values': values,
+}
 
 with open('generate/galaxies/mitre-enterprise-attack-intrusion-set.json', 'w') as galaxy_file:
     json.dump(galaxy, galaxy_file, indent=4)

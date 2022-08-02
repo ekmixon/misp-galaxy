@@ -63,14 +63,13 @@ def loadjsons(path):
     """
       Find all Jsons and load them in a dict
     """
-    files = []
-    data = []
-    for name in os.listdir(path):
-        if os.path.isfile(os.path.join(path, name)) and name.endswith('.json'):
-            files.append(name)
-    for jfile in files:
-        data.append(json.load(open("%s/%s" % (path, jfile))))
-    return data
+    files = [
+        name
+        for name in os.listdir(path)
+        if os.path.isfile(os.path.join(path, name)) and name.endswith('.json')
+    ]
+
+    return [json.load(open(f"{path}/{jfile}")) for jfile in files]
 
 
 def printjson(s):
@@ -78,7 +77,7 @@ def printjson(s):
 
 
 def to_tag(t, v):
-    return 'misp-galaxy:{}="{}"'.format(t, v)
+    return f'misp-galaxy:{t}="{v}"'
 
 
 def get_cluster_uuid(cluster):
@@ -104,7 +103,7 @@ if __name__ == '__main__':
 
         # ignore the galaxies that are not relevant for us
         if galaxy not in type_mapping:
-            print("Ignoring galaxy '{}' as it is not in the mapping.".format(galaxy))
+            print(f"Ignoring galaxy '{galaxy}' as it is not in the mapping.")
             continue
 
         # process the entries in each cluster
@@ -113,7 +112,7 @@ if __name__ == '__main__':
             names = [cluster['value']]
 
             if 'meta' in cluster and 'synonyms' in cluster['meta']:
-                names += [s for s in cluster['meta']['synonyms']]
+                names += list(cluster['meta']['synonyms'])
 
             # check if the entry is already in our mappings dict
             seen_once = False
@@ -138,9 +137,7 @@ if __name__ == '__main__':
 
             # it's not in any mapping, add it
             if not seen_once:
-                mapping = {}
-                mapping['names'] = names
-                mapping['values'] = [to_tag(galaxy, cluster['value'])]
+                mapping = {'names': names, 'values': [to_tag(galaxy, cluster['value'])]}
                 uuid = get_cluster_uuid(cluster)
                 mapping['uuids'] = [uuid]
                 mappings[type_mapping[galaxy]].append(mapping)
@@ -173,9 +170,10 @@ if __name__ == '__main__':
                     if uuid == cluster_uuid:
                         continue
                     # skip existing entries
-                    if 'related' in cluster:
-                        if any(v['dest-uuid'] == uuid for v in cluster['related']):
-                            continue
+                    if 'related' in cluster and any(
+                        v['dest-uuid'] == uuid for v in cluster['related']
+                    ):
+                        continue
                     # initialize array
                     if 'related' not in cluster:
                         cluster['related'] = []
@@ -195,7 +193,7 @@ if __name__ == '__main__':
             with open(os.path.join(path, name), 'w') as f_out:
                 json.dump(file_json, f_out, indent=2, sort_keys=True, ensure_ascii=False)
 
-            print("Updated file {}".format(name))
+            print(f"Updated file {name}")
     print("All done, please don't forget to ./validate_all.sh and ./jq_all_the_things.sh")
 
     # # simply dump the mapping_json to files. This is not really needed anymore

@@ -12,15 +12,8 @@ args = parser.parse_args()
 
 
 
-# read out all clusters and map them based on uuid
-
-
-# build a mapping between uuids and Clusters
-clusters = []
 pathClusters = '../../../clusters'
-for f in os.listdir(pathClusters):
-    if '.json' in f:
-        clusters.append(f)
+clusters = [f for f in os.listdir(pathClusters) if '.json' in f]
 clusters.sort()
 
 cluster_uuids = {}
@@ -36,6 +29,7 @@ for cluster in clusters:
 
 # read out all STIX mappings and store them in a list
 stix_relations = {}
+tags = []
 for subfolder in ['mobile-attack', 'pre-attack', 'enterprise-attack']:
     curr_dir = os.path.join(args.path, subfolder, 'relationship')
     for stix_fname in os.listdir(curr_dir):
@@ -45,7 +39,6 @@ for subfolder in ['mobile-attack', 'pre-attack', 'enterprise-attack']:
             rel_type = o['relationship_type']
             dest_uuid = re.findall(r'--([0-9a-f-]+)', o['target_ref']).pop()
             uuid = re.findall(r'--([0-9a-f-]+)', o['source_ref']).pop()
-            tags = []
             galaxy_fname = cluster_uuids[uuid]
             # print("{} \t {} \t {} \t {}".format(rel_type, uuid, dest_uuid, galaxy_fname))
             if not stix_relations.get(galaxy_fname):
@@ -62,9 +55,9 @@ for subfolder in ['mobile-attack', 'pre-attack', 'enterprise-attack']:
 # for each correlation per galaxy-file ,
 #   open the file, 
 #   add the relationship, 
-#   and save the galaxy file 
+#   and save the galaxy file
 for galaxy_fname, relations in stix_relations.items():
-    print("############# {}".format(galaxy_fname))
+    print(f"############# {galaxy_fname}")
     with open(os.path.join(pathClusters, galaxy_fname)) as f_in:
         file_json = json.load(f_in)
 
@@ -77,7 +70,7 @@ for galaxy_fname, relations in stix_relations.items():
                 if 'related' in cluster:
                     for r in cluster['related']:
                         if r['dest-uuid'] == v['dest-uuid']:
-                            print("  Mapping already exists! skipping... {}".format(v))
+                            print(f"  Mapping already exists! skipping... {v}")
                             skip = True
                             break
                 if skip:
@@ -85,7 +78,7 @@ for galaxy_fname, relations in stix_relations.items():
                 if 'related' not in cluster:
                     cluster['related'] = []
                 cluster['related'].append(v)
-                print("  Adding mapping: {}".format(v))
+                print(f"  Adding mapping: {v}")
                 break
 
     # increment version
